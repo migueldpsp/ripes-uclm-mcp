@@ -4,7 +4,7 @@
       "command": "python",
       "args": ["-m", "ripes_mcp"],
       "env": {
-        "PYTHONPATH": "src",
+        "PYTHONPATH": "${CLAUDE_PLUGIN_ROOT:-.}/src",
         "RIPES_PATH": "${RIPES_PATH:-}"
       }
     }

@@ -82,20 +82,46 @@ after running it.
 
 ## Connecting an MCP client
 
-### Claude Code
+### Claude Code and the Claude desktop app (recommended)
 
-The repository includes a `.mcp.json` file. Open Claude Code with this
-repository as the working folder and accept the `ripes` server when prompted.
+The repository is a Claude Code **plugin**. The plugin bundles the MCP server
+and a skill (`skills/ripes`) that describes the recommended workflow to the
+assistant. Once installed, the server is available in every session,
+whatever folder it is opened in.
 
-To make the server available in every project instead, register it at user
-level:
+Add the repository as a plugin marketplace and install the plugin:
 
 ```powershell
-claude mcp add ripes --scope user -- python -m ripes_mcp
+claude plugin marketplace add C:\path\to\ripes-uclm-mcp
 ```
 
-The repository also includes a Claude Code skill (`.claude/skills/ripes`)
-that describes the recommended workflow to the assistant.
+```powershell
+claude plugin install ripes-uclm@ripes-uclm
+```
+
+Alternatively, edit `%USERPROFILE%\.claude\settings.json` by hand:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "ripes-uclm": {
+      "source": { "source": "directory", "path": "C:\\path\\to\\ripes-uclm-mcp" }
+    }
+  },
+  "enabledPlugins": {
+    "ripes-uclm@ripes-uclm": true
+  }
+}
+```
+
+Start a new session afterwards. The server appears as `ripes` in the list of
+connectors.
+
+### Only inside this repository
+
+Without installing the plugin, the `.mcp.json` file at the repository root
+also works in a Claude Code session whose working folder is this repository.
+Accept the `ripes` server when prompted.
 
 ### Claude Desktop
 
@@ -171,6 +197,8 @@ Code layout:
 | `src/ripes_mcp/controller.py` | High-level Ripes operations |
 | `src/ripes_mcp/uia.py` | UI Automation, input and capture helpers |
 | `src/ripes_mcp/cli_runner.py` | Ripes command-line runs |
+| `skills/ripes/SKILL.md` | Workflow guidance for the assistant |
+| `.claude-plugin/`, `.mcp.json` | Plugin, marketplace and MCP server definitions |
 
 ## Limitations
 

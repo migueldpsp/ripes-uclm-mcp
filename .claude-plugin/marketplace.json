@@ -1,0 +1,11 @@
+{
+  "name": "ripes-uclm",
+  "owner": { "name": "ripes-uclm-mcp contributors" },
+  "plugins": [
+    {
+      "name": "ripes-uclm",
+      "source": "./",
+      "description": "MCP server and skill to operate the UCLM Ripes RISC-V simulator live on Windows."
+    }
+  ]
+}

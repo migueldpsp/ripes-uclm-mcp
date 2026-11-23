@@ -1,0 +1,6 @@
+{
+  "name": "ripes-uclm",
+  "version": "0.1.0",
+  "description": "Operate the UCLM Ripes RISC-V simulator on Windows: write and run assembly, configure processors and caches, set breakpoints and inspect registers, memory, pipeline and cache statistics live in the Ripes window.",
+  "keywords": ["ripes", "risc-v", "riscv", "simulator", "computer-architecture", "cache", "pipeline", "uclm", "mcp"]
+}
