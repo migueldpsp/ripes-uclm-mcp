@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ripes": {
+      "command": "python",
+      "args": ["-m", "ripes_mcp"],
+      "env": {
+        "PYTHONPATH": "src",
+        "RIPES_PATH": "${RIPES_PATH:-}"
+      }
+    }
+  }
+}
