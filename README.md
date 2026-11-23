@@ -54,58 +54,58 @@ macOS.
 
 ## Installation
 
+Installation takes three steps. No clone of the repository is needed.
+
+### 1. Install the Python dependencies
+
 ```powershell
-git clone https://github.com/migueldpsp/ripes-uclm-mcp.git
-cd ripes-uclm-mcp
-pip install -e .
+pip install "git+https://github.com/migueldpsp/ripes-uclm-mcp.git"
 ```
 
-This installs the `ripes_mcp` package and its dependencies: `mcp`,
-`pywinauto`, `pywin32` and `pillow`.
+This installs the `ripes_mcp` package and its dependencies (`mcp`,
+`pywinauto`, `pywin32` and `pillow`) into the Python that runs as `python`.
+The MCP server is started with that same command, so install into the Python
+that is first on your `PATH`.
 
-## Configuration
+### 2. Tell the server where Ripes is
 
-The server must know where `Ripes.exe` is. It looks in this order:
+The server looks for `Ripes.exe` in this order:
 
-1. The `RIPES_PATH` environment variable, if it is set.
+1. The `RIPES_PATH` environment variable.
 2. The `Ripes.exe` of a Ripes window that is already open.
 
-Setting `RIPES_PATH` is recommended, because it allows the server to start
-Ripes by itself. Use your own installation path:
+Setting `RIPES_PATH` is recommended, because it lets the server start Ripes
+by itself. Use your own installation path:
 
 ```powershell
 setx RIPES_PATH "C:\path\to\UCLM_Ripes-v1.1-win-x86_64\Ripes.exe"
 ```
 
-`setx` only affects programs started afterwards, so restart your MCP client
-after running it.
+`setx` only affects programs started afterwards.
 
-## Connecting an MCP client
+### 3. Install the plugin in Claude
 
-### Claude Code and the Claude desktop app (recommended)
-
-The repository is a Claude Code **plugin**. The plugin bundles the MCP server
-and a skill (`skills/ripes`) that describes the recommended workflow to the
-assistant. Once installed, the server is available in every session,
-whatever folder it is opened in.
-
-Add the repository as a plugin marketplace and install the plugin:
+The repository is a Claude Code **plugin** that bundles the MCP server and a
+skill (`skills/ripes`) describing the recommended workflow to the assistant.
+Once installed, it is available in every session, in Claude Code and in the
+Code tab of the Claude desktop app.
 
 ```powershell
-claude plugin marketplace add C:\path\to\ripes-uclm-mcp
+claude plugin marketplace add migueldpsp/ripes-uclm-mcp
 ```
 
 ```powershell
 claude plugin install ripes-uclm@ripes-uclm
 ```
 
-Alternatively, edit `%USERPROFILE%\.claude\settings.json` by hand:
+Without the `claude` command line, add the same entries to
+`%USERPROFILE%\.claude\settings.json`:
 
 ```json
 {
   "extraKnownMarketplaces": {
     "ripes-uclm": {
-      "source": { "source": "directory", "path": "C:\\path\\to\\ripes-uclm-mcp" }
+      "source": { "source": "github", "repo": "migueldpsp/ripes-uclm-mcp" }
     }
   },
   "enabledPlugins": {
@@ -114,19 +114,20 @@ Alternatively, edit `%USERPROFILE%\.claude\settings.json` by hand:
 }
 ```
 
-Start a new session afterwards. The server appears as `ripes` in the list of
-connectors.
+Fully close and reopen Claude (or start a new Claude Code session). The
+server appears as `ripes` in the list of connectors.
 
-### Only inside this repository
+### Checking the installation
 
-Without installing the plugin, the `.mcp.json` file at the repository root
-also works in a Claude Code session whose working folder is this repository.
-Accept the `ripes` server when prompted.
+Open Ripes and ask the assistant *"What is the Ripes status?"*. It should
+answer with the processor model shown in the Ripes status bar. In Claude
+Code, `/mcp` also lists the server as connected.
 
-### Claude Desktop
+### Other MCP clients
 
-Add the server to `claude_desktop_config.json` (Settings → Developer → Edit
-Config) and restart Claude Desktop:
+Any MCP client can start the server with `python -m ripes_mcp`. For chats in
+Claude Desktop, add it to `claude_desktop_config.json` (Settings → Developer
+→ Edit Config) and restart:
 
 ```json
 {
@@ -140,11 +141,18 @@ Config) and restart Claude Desktop:
 }
 ```
 
-### Checking the connection
+### Development setup
 
-Ask the assistant *"What is the Ripes status?"*. It should answer with the
-processor model that appears in the Ripes status bar. In Claude Code, `/mcp`
-also lists the server as connected.
+To work on the code, clone the repository and install it in editable mode:
+
+```powershell
+git clone https://github.com/migueldpsp/ripes-uclm-mcp.git
+cd ripes-uclm-mcp
+pip install -e .
+```
+
+Inside the repository, the root `.mcp.json` also works as a project-level
+server without installing the plugin.
 
 ## Usage
 
@@ -219,8 +227,8 @@ Code layout:
 
 | Symptom | Solution |
 | --- | --- |
-| The assistant has no `ripes_*` tools | Check that the server is registered and approved in the client, that `pip install -e .` succeeded, and restart the client. |
-| `Ripes.exe not found` | Open Ripes, or set `RIPES_PATH` and restart the client. |
+| The assistant has no `ripes_*` tools | Check that the plugin is installed and enabled, that step 1 succeeded for the Python on your `PATH`, and fully restart Claude. |
+| `Ripes.exe not found` | Open Ripes, or set `RIPES_PATH` and restart Claude. |
 | `Ripes is not running` | Ask the assistant to launch Ripes (requires `RIPES_PATH`) or open it manually. |
 | A Ripes dialog remains open | Close it with *Cancel* and repeat the request. |
 | Breakpoints are not detected | Use a blue accent colour in Windows. |

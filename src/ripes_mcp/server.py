@@ -13,8 +13,10 @@ from typing import Any, Callable
 
 try:  # mcp >= 2
     from mcp.server.mcpserver import Image, MCPServer as _Server
+    from mcp.server.mcpserver.exceptions import ToolError
 except ImportError:  # mcp 1.x
     from mcp.server.fastmcp import FastMCP as _Server, Image
+    from mcp.server.fastmcp.exceptions import ToolError
 
 from . import cli_runner
 
@@ -42,7 +44,19 @@ def _ctl():
 
 async def _ui(fn: Callable[..., Any], *args, **kwargs) -> Any:
     loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(_executor, functools.partial(fn, *args, **kwargs))
+    try:
+        return await loop.run_in_executor(_executor, functools.partial(fn, *args, **kwargs))
+    except ToolError:
+        raise
+    except Exception as exc:  # surface the reason to the assistant, not a generic error
+        raise ToolError(str(exc) or type(exc).__name__) from exc
+
+
+async def _thread(fn: Callable[..., Any], *args) -> Any:
+    try:
+        return await asyncio.to_thread(fn, *args)
+    except Exception as exc:
+        raise ToolError(str(exc) or type(exc).__name__) from exc
 
 
 def _call(method: str):
@@ -319,14 +333,14 @@ async def ripes_cli_run(
     Returns exit status, console output and a report with registers, cycles,
     CPI/IPC and the full pipeline diagram. sp/gp start as in the GUI.
     """
-    return await asyncio.to_thread(cli_runner.run_cli, code, processor, isa_extensions,
+    return await _thread(cli_runner.run_cli, code, processor, isa_extensions,
                                    cli_runner.DEFAULT_REGINIT, timeout_ms)
 
 
 @mcp.tool()
 async def ripes_check_assembly(code: str, isa_extensions: str = "M") -> dict:
     """Assemble without touching the window and report the first assembler error."""
-    return await asyncio.to_thread(cli_runner.check_assembly, code, isa_extensions)
+    return await _thread(cli_runner.check_assembly, code, isa_extensions)
 
 
 def main() -> None:
